@@ -1,0 +1,6 @@
+BLACK DEAR TIPS V21.4
+- Game/result tables are 84% width and centered to match the user's marked reference area.
+- Tip and status text use the same serif typography as game names.
+- Active/pending is gold, won is green, lost is red.
+- Yesterday's heading is slightly smaller than Today's heading.
+- Existing buttons, Supabase, VIP, Admin and ZetuPay logic are unchanged.

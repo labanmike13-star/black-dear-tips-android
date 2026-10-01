@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>VIP Tips | BLACK-DEAR-TIPS</title>
+<style>*{box-sizing:border-box}body{margin:0;background:#070707;color:#fff;font-family:Arial,Helvetica,sans-serif}.wrap{width:min(94%,700px);margin:auto;padding:28px 0 50px}.brand{text-align:center;color:#ffd400;font-weight:900;font-size:25px;letter-spacing:1px}.sub{text-align:center;color:#999;font-size:13px;margin:7px 0 22px}.card{background:#111;border:1px solid #292929;border-radius:18px;padding:20px;box-shadow:0 12px 35px rgba(0,0,0,.35)}h1{text-align:center;font-size:22px;margin:0 0 8px}.expiry{text-align:center;color:#ffd400;font-size:13px;margin-bottom:20px}.tip{display:grid;grid-template-columns:1fr auto auto;gap:10px;align-items:center;padding:14px 8px;border-bottom:1px solid #252525}.game{font-weight:800}.pick{color:#ffd400;font-weight:900}.status{font-size:11px;color:#aaa}.empty{text-align:center;color:#999;padding:30px}.error{text-align:center;color:#ff9d9d}.back{display:block;text-align:center;color:#ffd400;text-decoration:none;margin-top:18px;font-size:13px}@media(max-width:560px){.tip{grid-template-columns:1fr}.pick,.status{justify-self:start}}</style></head>
+<body><main class="wrap"><div class="brand">BLACK-DEAR-TIPS</div><div class="sub">Premium VIP football tips</div><section class="card"><h1>🔥 VIP ACCESS ACTIVE</h1><div id="expiry" class="expiry">Checking access...</div><div id="tips"><div class="empty">Loading VIP tips...</div></div></section><a class="back" href="/">← Back to BLACK-DEAR-TIPS</a></main>
+<script>
+(async function(){
+ const token=new URLSearchParams(location.search).get('token');
+ const box=document.getElementById('tips'), expiry=document.getElementById('expiry');
+ if(!token){box.innerHTML='<div class="error">VIP access link is missing.</div>';expiry.textContent='';return}
+ try{
+  const r=await fetch('/api/vip-access?token='+encodeURIComponent(token)); const d=await r.json();
+  if(!r.ok||!d.success) throw new Error(d.error||'Access unavailable');
+  expiry.textContent='Access active until '+new Date(d.expiresAt).toLocaleString();
+  const tips=Array.isArray(d.tips)?d.tips:[];
+  if(!tips.length){box.innerHTML='<div class="empty">No VIP tips published yet.</div>';return}
+  box.innerHTML=tips.map(t=>'<div class="tip"><div class="game">'+esc(t.match)+'</div><div class="pick">'+esc(t.tip)+'</div><div class="status">'+esc(t.status||'PENDING')+(t.date?' • '+esc(t.date):'')+'</div></div>').join('');
+ }catch(e){expiry.textContent='';box.innerHTML='<div class="error">'+esc(e.message)+'</div>'}
+ function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+})();
+</script></body></html>

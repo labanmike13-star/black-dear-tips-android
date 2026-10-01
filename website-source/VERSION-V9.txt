@@ -1,0 +1,5 @@
+
+BLACK-DEAR-TIPS
+VERSION: V9 CLEAN PROFILE
+Changes: remove left divider, move BLÅCK DEÅR onto cap area, brighten WON badges.
+Payment system unchanged.

@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+<link rel="icon" type="image/png" sizes="512x512" href="/favicon.png">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>BLACK-DEAR-TIPS</title>
+  <link rel="icon" type="image/png" href="black-dear-logo.png">
+  <link rel="stylesheet" href="style.css">
+<style>
+.vip-standalone{display:flex;justify-content:center;margin:18px auto 24px;position:relative;z-index:2}
+.vip-nav-button{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:11px 24px;border-radius:999px;text-decoration:none;font-weight:800;color:#080808;background:#fff;border:1px solid #ddd;box-shadow:0 5px 16px rgba(0,0,0,.22);font-size:15px}
+.vip-nav-button:hover{transform:translateY(-1px)}
+</style></head>
+<body class="home-page">
+<header class="bd-header">
+  <div class="bd-brand">
+    <div class="bd-wordmark"><span>BLACK DEAR</span><small>TIPS</small></div>
+  </div>
+</header>
+
+<main class="bd-home-main">
+  <section class="bd-hero">
+    <div class="bd-games-area">
+      <section class="bd-welcome" aria-label="Welcome to Black Dear Zone">
+        <div class="bd-profile-corner">
+          <img src="black-dear-portrait.png" alt="Black Dear profile">
+          <span>BLÅCK DEÅR</span>
+        </div>
+        <div class="bd-welcome-copy">
+          <h1>BLACK DEAR ZONE</h1>
+          <div class="bd-winline">99% OF WINNINGS</div>
+          <div class="bd-responsible">BET RESPONSIBLE ‼️</div>
+          <div class="bd-age">NO UNDER 18</div>
+        </div>
+      </section>
+
+      <div class="bd-day-banner">
+        <div class="bd-day-title" id="todayTitle">TODAY'S GAMES</div>
+        <div class="bd-day-sub">FOOTBALL TIPS <span>•</span> DAILY PICKS</div>
+      </div>
+
+      <div class="bd-quick-actions">
+        <a class="bd-action-3d telegram-action" href="https://t.me/black_dear1" target="_blank" rel="noopener"><span>➤</span> TELEGRAM</a>
+        <a class="bd-action-3d whatsapp-action" href="https://wa.me/447808354306" target="_blank" rel="noopener"><span>◉</span> WHATSAPP</a>
+      </div>
+
+      <section class="vip-results-panel" aria-label="VIP Results">
+        <div class="vip-results-title">V.I.P RESULTS</div>
+        <div class="vip-results-options">
+          <a class="vip-result-btn" href="vip.html?category=over-2-5">V.I.P OVER 2.5</a>
+        </div>
+      </section>
+
+      <section id="tips" class="board-section bd-board-section">
+        <div id="tipsList" class="prediction-board">
+          <div class="board-loading">Loading tips...</div>
+        </div>
+        <div class="bd-note">Transparent results. No prediction is guaranteed.</div>
+      </section>
+      <section class="community-wrap" aria-label="Community">
+        <div class="community-card">
+          <div class="community-title">⚽ WHAT DO YOU THINK?</div>
+          <div class="community-actions">
+            <button id="likeBtn" class="community-btn like-3d" type="button"><span>♥</span> LIKE <b id="likeCount">0</b></button>
+            <button id="commentBtn" class="community-btn comment-3d" type="button"><span>💬</span> COMMENT</button>
+          </div>
+          <div id="commentBox" class="comment-box" hidden>
+            <input id="commentName" class="comment-name" maxlength="40" placeholder="Your name">
+            <textarea id="commentInput" maxlength="500" placeholder="Write your comment..."></textarea>
+            <button id="postCommentBtn" class="post-comment-3d" type="button">POST COMMENT</button>
+            <div id="commentList" class="comment-list"><div class="comment-empty">Loading comments...</div></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="contact" class="contact-section">
+        <a id="telegramLink" class="telegram-3d" href="https://t.me/black_dear1" target="_blank" rel="noopener"><span class="tg-icon" aria-hidden="true">➤</span><span>TELEGRAM</span></a>
+      </section>
+    </div>
+  </section>
+</main>
+
+<footer>BLACK-DEAR-TIPS.COM</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = 'https://mykoshiarlfhvpvrblvi.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_WeKxOhE2HFXMPpFYcbc6rg_zChHajkK';
+
+function esc(v){
+  return String(v ?? '').replace(/[&<>"']/g,m=>({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'
+  }[m]));
+}
+
+function dateKeyValue(v){
+  if(!v) return null;
+  const m=String(v).match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  return m ? `${m[1]}-${m[2]}-${m[3]}` : null;
+}
+function dateLabel(key){
+  if(!key) return {title:'DATE NOT SET', date:''};
+  const d=new Date(key+'T00:00:00');
+  if(Number.isNaN(d.getTime())) return {title:'DATE NOT SET',date:''};
+  const now=new Date();
+  const today=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+  const diff=Math.round((d-today)/86400000);
+  const title=diff===0?'TODAY\'S GAMES':diff===1?'TOMORROW':d.toLocaleDateString(undefined,{weekday:'long'}).toUpperCase();
+  const date=d.toLocaleDateString(undefined,{day:'2-digit',month:'short',year:'numeric'}).toUpperCase();
+  return {title,date};
+}
+function boardHTML(data){
+  const rows = Array.isArray(data) ? data : [];
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const keyFor = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  const todayKey = keyFor(today);
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate()-1);
+  const yesterdayKey = keyFor(yesterday);
+
+  const grouped = { [todayKey]: [], [yesterdayKey]: [] };
+  rows.forEach(t=>{
+    const key = dateKeyValue(t.match_date);
+    if(key && grouped[key]) grouped[key].push(t);
+  });
+
+  function renderBox(title, dateKey, items, emptyText){
+    const dateText = new Date(dateKey+'T00:00:00').toLocaleDateString(undefined,{day:'2-digit',month:'short',year:'numeric'}).toUpperCase();
+    const content = items.length ? items.map(t=>{
+      const rawStatus=String(t.status||'PENDING').toUpperCase();
+      const cls=rawStatus.toLowerCase();
+      const badge=rawStatus==='WON'?'WON':rawStatus==='LOST'?'LOST':'ACTIVE';
+      return '<div class="bd-exact-row">'+
+        '<span class="bd-exact-game">'+esc(t.match_name)+'</span>'+ 
+        '<span class="bd-exact-tip">'+esc(t.tip)+'</span>'+ 
+        '<span class="bd-exact-status '+cls+'">'+esc(badge)+'</span>'+ 
+      '</div>';
+    }).join('') : '<div class="bd-empty-box">'+esc(emptyText)+'</div>';
+
+    return '<section class="bd-results-box '+(dateKey===todayKey?'is-today':'is-yesterday')+'">'+
+      '<div class="bd-results-title">'+title+'</div>'+
+      '<div class="bd-results-date">'+dateText+'</div>'+
+      '<div class="bd-exact-board">'+
+        '<div class="bd-exact-head"><span>games</span><span>tips</span><span>status</span></div>'+
+        content+
+      '</div>'+
+    '</section>';
+  }
+
+  return renderBox("TODAY'S GAMES", todayKey, grouped[todayKey], 'No games published for today.')+
+         renderBox("YESTERDAY'S GAMES", yesterdayKey, grouped[yesterdayKey], 'No games published for yesterday.');
+}
+
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY);
+let tipsRequestRunning = false;
+async function loadTips(){
+  if(tipsRequestRunning) return;
+  tipsRequestRunning = true;
+  const box=document.getElementById('tipsList');
+  try {
+    const {data, error} = await supabaseClient
+      .from('tips')
+      .select('match_name,tip,status,match_date,created_at')
+      .order('created_at', {ascending:false});
+    if(error) throw error;
+    box.innerHTML = boardHTML(Array.isArray(data) ? data : []);
+  } catch(err) {
+    console.error('Public tips error:', err);
+    if(!box.querySelector('.board-row')) {
+      box.innerHTML='<div class="board-loading">Unable to load live tips. Please refresh.</div>';
+    }
+  } finally {
+    tipsRequestRunning = false;
+  }
+}
+
+const telegram=document.getElementById('telegramLink');
+if(telegram) telegram.href='https://t.me/black_dear1';
+
+loadTips();
+// Keep the public board fresh without requiring a page refresh.
+setInterval(loadTips,3000);
+
+// If realtime is available for the table, refresh immediately after an admin change.
+try{
+  supabaseClient.channel('public-tips-live').on('postgres_changes',{event:'*',schema:'public',table:'tips'},()=>loadTips()).subscribe();
+}catch(e){console.warn('Realtime unavailable',e)}
+</script>
+
+<script>
+(function(){
+  const likeBtn=document.getElementById('likeBtn'), likeCount=document.getElementById('likeCount');
+  const commentBtn=document.getElementById('commentBtn'), commentBox=document.getElementById('commentBox');
+  const commentName=document.getElementById('commentName'), commentInput=document.getElementById('commentInput');
+  const postCommentBtn=document.getElementById('postCommentBtn'), commentList=document.getElementById('commentList');
+  if(!likeBtn) return;
+
+  let liked=localStorage.getItem('bdt_liked')==='1';
+  let likes=Number(localStorage.getItem('bdt_likes')||'0');
+  likeCount.textContent=likes; likeBtn.classList.toggle('liked',liked);
+  likeBtn.addEventListener('click',()=>{liked=!liked;likes=Math.max(0,likes+(liked?1:-1));localStorage.setItem('bdt_liked',liked?'1':'0');localStorage.setItem('bdt_likes',String(likes));likeCount.textContent=likes;likeBtn.classList.toggle('liked',liked)});
+
+  function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+  function timeAgo(v){const d=new Date(v),sec=Math.max(1,Math.floor((Date.now()-d.getTime())/1000));if(sec<60)return sec+'s ago';const min=Math.floor(sec/60);if(min<60)return min+'m ago';const h=Math.floor(min/60);if(h<24)return h+'h ago';const days=Math.floor(h/24);return days+'d ago'}
+  let comments=[];
+  async function loadComments(){
+    const {data,error}=await supabaseClient.from('comments').select('id,parent_id,name,body,created_at').order('created_at',{ascending:true});
+    if(error){console.error(error);commentList.innerHTML='<div class="comment-empty">Comments are unavailable right now.</div>';return}
+    comments=data||[];renderComments();
+  }
+  function renderComments(){
+    if(!comments.length){commentList.innerHTML='<div class="comment-empty">No comments yet. Be the first!</div>';return}
+    const children={};comments.forEach(c=>(children[c.parent_id||0]??=[]).push(c));
+    function branch(parent,depth){return (children[parent]||[]).map(c=>{
+      const replies=branch(c.id,depth+1);
+      return `<div class="comment-item thread-${Math.min(depth,4)}" data-comment-id="${c.id}"><div class="comment-head"><strong>${esc(c.name)}</strong><span>${timeAgo(c.created_at)}</span></div><div class="comment-body">${esc(c.body)}</div><div class="comment-tools"><button class="reply-btn" data-reply="${c.id}">↩ REPLY</button></div><div class="reply-area" id="reply-area-${c.id}" hidden><input class="reply-name" maxlength="40" placeholder="Your name"><textarea class="reply-text" maxlength="500" placeholder="Write a reply..."></textarea><button class="post-reply-3d" data-parent="${c.id}">POST REPLY</button></div>${replies}</div>`;
+    }).join('')}
+    commentList.innerHTML=branch(0,0);
+  }
+  async function insertComment(parentId,name,body){
+    const cleanName=(name||'').trim()||'Guest', cleanBody=(body||'').trim(); if(!cleanBody)return;
+    const btn=parentId?commentList.querySelector(`.post-reply-3d[data-parent="${parentId}"]`):postCommentBtn; if(btn)btn.disabled=true;
+    const {error}=await supabaseClient.from('comments').insert({parent_id:parentId||null,name:cleanName,body:cleanBody});
+    if(error){alert('Could not post comment: '+error.message);if(btn)btn.disabled=false;return}
+    localStorage.setItem('bdt_comment_name',cleanName); if(parentId){const area=document.getElementById('reply-area-'+parentId);if(area)area.hidden=true}else{commentInput.value=''};
+    await loadComments();
+  }
+  commentName.value=localStorage.getItem('bdt_comment_name')||'';
+  commentBtn.addEventListener('click',()=>{commentBox.hidden=!commentBox.hidden;if(!commentBox.hidden){loadComments();commentName.focus()}});
+  postCommentBtn.addEventListener('click',()=>insertComment(null,commentName.value,commentInput.value));
+  commentList.addEventListener('click',e=>{
+    const reply=e.target.closest('.reply-btn');
+    if(reply){const area=document.getElementById('reply-area-'+reply.dataset.reply);if(area){area.hidden=!area.hidden;if(!area.hidden){const n=area.querySelector('.reply-name');n.value=localStorage.getItem('bdt_comment_name')||'';n.focus()}}return}
+    const post=e.target.closest('.post-reply-3d');
+    if(post){const area=document.getElementById('reply-area-'+post.dataset.parent);insertComment(Number(post.dataset.parent),area.querySelector('.reply-name').value,area.querySelector('.reply-text').value)}
+  });
+  loadComments();
+  try{supabaseClient.channel('public-comments-live').on('postgres_changes',{event:'*',schema:'public',table:'comments'},()=>loadComments()).subscribe()}catch(e){console.warn('Comment realtime unavailable',e)}
+})();
+</script>
+
+</body>
+</html>

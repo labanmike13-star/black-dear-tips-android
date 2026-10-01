@@ -1,0 +1,16 @@
+BLACK-DEAR-TIPS
+DESIGN VERSION: V8 CLEAN ZOOMED PROFILE
+LEFT PROFILE: FIXED
+RIGHT GAMES: INDEPENDENT SCROLL
+Portrait: zoomed, circular frame removed
+Status colors: WON green / ACTIVE yellow / LOST red
+Payment: ZetuPay M-Pesa STK Push unchanged
+VIP plans: Daily 500 / Weekly 3500 / Monthly 15000
+
+V14 UPDATE: WhatsApp 3D button + VIP Results options (Correct Score / HT FT / Over 2.5).
+
+V15: Added public V.I.P SLIPS history page and animated WON/LOST/ACTIVE status controls.
+
+V16
+
+V17: Moved V.I.P SLIPS into the V.I.P RESULTS list; removed standalone top V.I.P SLIPS button.

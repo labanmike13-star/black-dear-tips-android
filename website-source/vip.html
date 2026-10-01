@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VIP Access | BLACK-DEAR-TIPS</title>
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;min-height:100vh;font-family:Arial,Helvetica,sans-serif;background:#050505;color:#fff}
+    .wrap{width:min(94%,540px);margin:0 auto;padding:20px 0 42px}
+    .category-hero{text-align:center;margin-bottom:12px}
+    .category-badge{display:inline-block;padding:10px 18px;border-radius:999px;border:1px solid #55ff16;color:#7dff46;background:#091107;font-weight:900;font-size:12px;letter-spacing:1px;box-shadow:0 0 20px rgba(73,255,0,.18)}
+    .top{text-align:center;margin:10px 0 16px}.brand{font-size:26px;font-weight:900;letter-spacing:1.4px;color:#ffd400}.sub{margin-top:5px;color:#8f8f8f;font-size:12px}
+    .results-card,.payment-card{background:linear-gradient(180deg,#101410,#090909);border:1px solid #252b25;border-radius:20px;padding:16px;box-shadow:0 12px 32px rgba(0,0,0,.45)}
+    .results-card h2{text-align:center;margin:0;font-size:18px;letter-spacing:1px;color:#7cff45}.subline{text-align:center;color:#777;font-size:10px;margin:5px 0 12px;text-transform:uppercase;letter-spacing:1px}
+    .result-row{display:grid;grid-template-columns:1fr auto;gap:9px;align-items:center;padding:11px 4px;border-bottom:1px solid #202420}.result-row:last-child{border-bottom:0}.result-match{font-weight:800;font-size:13px}.result-tip{font-size:11px;color:#ffd400;font-weight:900;margin-top:3px}.result-status{font-size:10px;font-weight:900;padding:6px 8px;border-radius:8px;min-width:52px;text-align:center}.result-status.won{background:#073b12;color:#52ff78;border:1px solid #1abf42}.result-status.lost{background:#3a0808;color:#ff6969;border:1px solid #d83d3d}.result-status.pending{background:#302500;color:#ffe46a;border:1px solid #a88b18}.results-empty,.results-error{text-align:center;color:#888;font-size:12px;padding:18px 4px}
+    .subscribe-wrap{text-align:center;margin:0 0 10px}.vip-subscription-top{position:sticky;top:0;z-index:4;padding:2px 0 10px;background:linear-gradient(180deg,#101410 75%,rgba(16,20,16,0));}.results-divider{height:1px;background:#202420;margin:16px 0 14px}.results-head{text-align:center}.subscribe-btn,.plan,.pay{position:relative;overflow:hidden;isolation:isolate}.subscribe-btn{width:100%;border:1px solid #55ff16;border-radius:14px;padding:13px;background:linear-gradient(180deg,#182915,#0b1309);color:#82ff4d;font-weight:900;letter-spacing:1px;font-size:13px;box-shadow:0 5px 0 #1b4e0e,0 0 20px rgba(73,255,0,.16);cursor:pointer}.subscribe-btn:active{transform:translateY(2px);box-shadow:0 3px 0 #1b4e0e}.subscribe-btn::before,.plan::before,.pay::before{content:"";position:absolute;width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.28);left:16%;bottom:-11px;z-index:-1;animation:bubble 3.6s ease-in-out infinite}.subscribe-btn::after,.plan::after,.pay::after{content:"";position:absolute;width:17px;height:17px;border-radius:50%;background:rgba(255,255,255,.18);right:12%;top:-8px;z-index:-1;animation:bubble2 4.2s ease-in-out infinite}.subscribe-btn .arrow{margin-left:6px}
+    @keyframes bubble{0%,100%{transform:translateY(0) scale(.85);opacity:.25}50%{transform:translateY(-22px) scale(1.05);opacity:.55}}@keyframes bubble2{0%,100%{transform:translateY(0);opacity:.2}50%{transform:translateY(24px);opacity:.5}}
+    .payment-card{display:none;margin-top:10px}.payment-card.open{display:block;animation:openCard .22s ease-out}@keyframes openCard{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+    .payment-title{text-align:center;font-size:18px;font-weight:900;margin:0;color:#fff}.price{text-align:center;margin:5px 0 14px;color:#ffd400;font-size:18px;font-weight:900}
+    .plans{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}.plan{border:1px solid #55ff16;border-radius:13px;background:linear-gradient(180deg,#14200f,#0b1009);color:#e9ffe2;padding:11px 5px;text-align:center;cursor:pointer;font-weight:900;font-size:11px;box-shadow:0 4px 0 #163b0d,0 0 10px rgba(73,255,0,.1)}.plan strong{display:block;color:#82ff4d;font-size:12px;margin-bottom:3px}.plan.active{background:linear-gradient(180deg,#253b1c,#10200d);box-shadow:0 4px 0 #1e6a10,0 0 18px rgba(73,255,0,.18)}
+    .form-grid{display:grid;grid-template-columns:1fr;gap:7px}label{display:block;font-size:11px;color:#a9a9a9;margin:4px 0 2px}input{width:100%;border:1px solid #303430;background:#080908;color:#fff;border-radius:9px;padding:10px 11px;font-size:13px;outline:none;height:40px}input:focus{border-color:#65ff2b;box-shadow:0 0 0 2px rgba(73,255,0,.07)}
+    .pay{width:100%;margin-top:13px;padding:12px;border:1px solid #e8c400;border-radius:11px;background:linear-gradient(180deg,#ffd91a,#e5b900);color:#080808;font-size:14px;font-weight:900;cursor:pointer;box-shadow:0 4px 0 #7b6200}.pay:active{transform:translateY(2px);box-shadow:0 2px 0 #7b6200}.pay:disabled{opacity:.55;cursor:not-allowed}
+    .status{display:none;margin-top:10px;padding:10px;border-radius:9px;text-align:center;font-size:12px;line-height:1.4}.status.show{display:block}.status.error{background:#2a0d0d;border:1px solid #7c2929;color:#ffb2b2}.status.loading{background:#211d00;border:1px solid #665900;color:#ffe76a}.note{margin-top:11px;text-align:center;color:#777;font-size:10px;line-height:1.45}.back,.back-home{display:block;text-align:center;margin-top:12px;color:#777;text-decoration:none;font-size:11px}.back:hover,.back-home:hover{color:#fff}
+    @media(max-width:430px){.wrap{width:min(92%,520px)}.result-row{grid-template-columns:1fr auto}.result-status{min-width:48px}.plans{gap:6px}.plan{padding:10px 3px}}
+</style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="category-hero"><div id="categoryBadge" class="category-badge">V.I.P</div></div>
+    <div class="top">
+      <div class="brand">BLACK-DEAR-TIPS</div>
+      <div class="sub">Premium football tips • Secure M-Pesa payment</div>
+    </div>
+
+    <section class="results-card" aria-label="VIP subscription and yesterday results">
+      <div class="subscribe-wrap vip-subscription-top">
+        <button id="subscribeBtn" class="subscribe-btn" type="button">💎 V.I.P SUBSCRIPTION <span class="arrow">▼</span></button>
+      </div>
+
+      <section id="paymentCard" class="payment-card" aria-label="VIP subscription payment">
+      <h1 id="paymentTitle" class="payment-title">🔥 VIP SUBSCRIPTION</h1>
+      <div class="price" id="price">KSh 500</div>
+
+      <div class="plans">
+        <button type="button" class="plan active" data-plan="daily"><strong>DAILY</strong>KSh 500</button>
+        <button type="button" class="plan" data-plan="weekly"><strong>WEEKLY</strong>KSh 3,500</button>
+        <button type="button" class="plan" data-plan="monthly"><strong>MONTHLY</strong>KSh 15,000</button>
+      </div>
+
+      <form id="vipForm" novalidate>
+        <div class="form-grid">
+          <div><label for="name">Full name</label><input id="name" name="name" type="text" autocomplete="name" placeholder="Full name" required></div>
+          <div><label for="email">Email</label><input id="email" name="email" type="email" autocomplete="email" placeholder="Email address" required></div>
+          <div><label for="phone">M-Pesa phone</label><input id="phone" name="phone" type="tel" inputmode="numeric" autocomplete="tel" placeholder="07XXXXXXXX or 2547XXXXXXXX" required></div>
+        </div>
+        <button id="payBtn" class="pay" type="submit">🔥 PAY KSh 500 WITH M-PESA</button>
+      </form>
+      <div id="status" class="status"></div>
+      <div class="note">M-Pesa STK prompt will appear on your phone. Approve it with your M-Pesa PIN to activate VIP access.</div>
+      <a class="back" href="/">← Back to BLACK-DEAR-TIPS</a>
+      </section>
+
+      <div class="results-divider"></div>
+      <div class="results-head">
+        <h2 id="resultsTitle">YESTERDAY'S V.I.P RESULTS</h2>
+        <div id="resultsSubline" class="subline">Loading yesterday's results...</div>
+      </div>
+      <div id="yesterdayResults"><div class="results-empty">Loading...</div></div>
+      <div class="results-divider"></div>
+      <div class="results-head"><h2>TODAY'S V.I.P TIPS</h2><div class="subline">🔒 VIP SUBSCRIBERS ONLY</div></div>
+      <div class="results-empty">🔒 Today's VIP tips are locked. Subscribe above to unlock today's tips.</div>
+    </section>
+    <a class="back-home" href="/">← Back to BLACK-DEAR-TIPS</a>
+  </main>
+
+<script>
+(function () {
+  "use strict";
+
+  const CATEGORY_INFO = {
+    "correct-score": { label: "V.I.P CORRECT SCORE", short: "CORRECT SCORE" },
+    "ht-ft": { label: "V.I.P HT FT", short: "HT FT" },
+    "over-2-5": { label: "V.I.P OVER 2.5", short: "OVER 2.5" },
+    "all": { label: "V.I.P RESULTS", short: "ALL VIP RESULTS" }
+  };
+  const params = new URLSearchParams(window.location.search);
+  const selectedCategory = params.get("category") || "all";
+  const categoryInfo = CATEGORY_INFO[selectedCategory] || CATEGORY_INFO.all;
+  document.title = categoryInfo.label + " | BLACK-DEAR-TIPS";
+  const badge = document.getElementById("categoryBadge");
+  if (badge) badge.textContent = categoryInfo.label;
+  const priceTitle = document.querySelector(".title");
+  if (priceTitle) priceTitle.textContent = "🔥 " + categoryInfo.label;
+
+  const subscribeBtn = document.getElementById("subscribeBtn");
+  const paymentCard = document.getElementById("paymentCard");
+  if (subscribeBtn && paymentCard) {
+    subscribeBtn.addEventListener("click", function () {
+      const opening = !paymentCard.classList.contains("open");
+      paymentCard.classList.toggle("open", opening);
+      subscribeBtn.innerHTML = opening ? "💎 V.I.P SUBSCRIPTION <span class=\"arrow\">▲</span>" : "💎 V.I.P SUBSCRIPTION <span class=\"arrow\">▼</span>";
+      if (opening) paymentCard.scrollIntoView({behavior:"smooth", block:"start"});
+    });
+  }
+
+  function escHtml(v) {
+    return String(v ?? "").replace(/[&<>"']/g, function(m){ return ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]); });
+  }
+  function nairobiDate(offsetDays) {
+    const parts = new Intl.DateTimeFormat('en-CA',{timeZone:'Africa/Nairobi',year:'numeric',month:'2-digit',day:'2-digit'}).formatToParts(new Date());
+    const base = new Date(Date.UTC(Number(parts.find(p=>p.type==='year').value), Number(parts.find(p=>p.type==='month').value)-1, Number(parts.find(p=>p.type==='day').value)));
+    base.setUTCDate(base.getUTCDate() + (offsetDays||0));
+    return base.toISOString().slice(0,10);
+  }
+  function yesterdayISO() {
+    return nairobiDate(-1);
+  }
+  async function loadYesterdayResults() {
+    const box = document.getElementById("yesterdayResults");
+    const sub = document.getElementById("resultsSubline");
+    const date = yesterdayISO();
+    sub.textContent = (categoryInfo.short === "ALL VIP RESULTS" ? "ALL VIP CATEGORIES" : categoryInfo.short) + " • " + date;
+    try {
+      const apiCategory = categoryInfo.short === "ALL VIP RESULTS" ? "" : categoryInfo.short;
+      const url = "/api/vip-slips?category=" + encodeURIComponent(apiCategory) + "&date=" + encodeURIComponent(date);
+      const response = await fetch(url);
+      const data = await response.json().catch(function(){return {};});
+      if (!response.ok || !data.success) throw new Error(data.error || "Unable to load results");
+      const tips = Array.isArray(data.tips) ? data.tips : [];
+      if (!tips.length) {
+        box.innerHTML = '<div class="results-empty">No ' + escHtml(categoryInfo.short.toLowerCase()) + ' results published for yesterday yet.</div>';
+        return;
+      }
+      box.innerHTML = tips.map(function(t){
+        const status = String(t.status || "PENDING").toLowerCase();
+        const badgeText = status === "won" ? "WON" : status === "lost" ? "LOST" : "ACTIVE";
+        return '<div class="result-row"><div><div class="result-match">' + escHtml(t.match) + '</div><div class="result-tip">' + escHtml(t.tip) + '</div></div><div class="result-status ' + escHtml(status) + '">' + badgeText + '</div></div>';
+      }).join("");
+    } catch (e) {
+      console.error(e);
+      box.innerHTML = '<div class="results-error">Unable to load yesterday results. Please refresh.</div>';
+    }
+  }
+
+  loadYesterdayResults();
+
+  const plans = {
+    daily:   { amount: 500 },
+    weekly:  { amount: 3500 },
+    monthly: { amount: 15000 }
+  };
+
+  let selectedPlan = "daily";
+  let pollingTimer = null;
+
+  const form = document.getElementById("vipForm");
+  const payBtn = document.getElementById("payBtn");
+  const statusBox = document.getElementById("status");
+  const priceBox = document.getElementById("price");
+  const planButtons = document.querySelectorAll(".plan");
+
+  function money(n) { return "KSh " + Number(n).toLocaleString("en-KE"); }
+  function setStatus(message, type) { statusBox.textContent = message; statusBox.className = "status show " + type; }
+  function clearStatus() { statusBox.textContent = ""; statusBox.className = "status"; }
+
+  function normalizeKenyanPhone(value) {
+    let p = String(value || "").trim().replace(/[\s-]/g, "");
+    if (p.startsWith("+254")) p = p.substring(1);
+    if (p.startsWith("07") || p.startsWith("01")) p = "254" + p.substring(1);
+    return p;
+  }
+
+  function stopPolling() { if (pollingTimer) { clearInterval(pollingTimer); pollingTimer = null; } }
+
+  async function checkPayment(reference, paymentKey) {
+    try {
+      const response = await fetch("/api/zetupay-status?reference=" + encodeURIComponent(reference) + "&paymentKey=" + encodeURIComponent(paymentKey));
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data.success) return;
+
+      if (data.status === "success" && data.accessToken) {
+        stopPolling();
+        setStatus("✅ Payment confirmed! Opening your VIP access...", "loading");
+        setTimeout(function () {
+          window.location.href = "/vip-access.html?token=" + encodeURIComponent(data.accessToken) + "&category=" + encodeURIComponent(categoryInfo.short);
+        }, 700);
+        return;
+      }
+
+      if (data.status === "failed" || data.status === "cancelled" || data.status === "expired") {
+        stopPolling();
+        setStatus("M-Pesa payment was " + data.status + ". Please try again.", "error");
+        payBtn.disabled = false;
+        payBtn.textContent = "🔥 PAY " + money(plans[selectedPlan].amount) + " WITH M-PESA";
+        return;
+      }
+    } catch (_) {}
+  }
+
+  planButtons.forEach(function (button) {
+    button.addEventListener("click", function () {
+      selectedPlan = button.dataset.plan;
+      planButtons.forEach(function (b) { b.classList.toggle("active", b === button); });
+      const amount = plans[selectedPlan].amount;
+      priceBox.textContent = money(amount);
+      payBtn.textContent = "🔥 PAY " + money(amount) + " WITH M-PESA";
+      clearStatus();
+    });
+  });
+
+  form.addEventListener("submit", async function (event) {
+    event.preventDefault();
+    if (payBtn.disabled) return;
+
+    stopPolling();
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const phone = normalizeKenyanPhone(document.getElementById("phone").value);
+
+    if (!name || name.length < 2) return setStatus("Please enter your full name.", "error");
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return setStatus("Please enter a valid email address.", "error");
+    if (!/^254(7|1)\d{8}$/.test(phone)) return setStatus("Enter a valid Kenyan M-Pesa number, e.g. 0712345678.", "error");
+
+    payBtn.disabled = true;
+    payBtn.textContent = "SENDING M-PESA PROMPT...";
+    setStatus("Please wait. An M-Pesa payment prompt will appear on your phone.", "loading");
+
+    try {
+      const response = await fetch("/api/zetupay-initiate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, phone, plan: selectedPlan })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || !data.success) throw new Error(data.error || data.message || "Unable to start the M-Pesa payment.");
+
+      setStatus("📱 Check your phone now and enter your M-Pesa PIN to approve KSh " + Number(data.amount).toLocaleString("en-KE") + ".", "loading");
+
+      let attempts = 0;
+      pollingTimer = setInterval(async function () {
+        attempts++;
+        await checkPayment(data.reference, data.payment_key);
+        if (attempts >= 24) {
+          stopPolling();
+          setStatus("We are still waiting for the M-Pesa confirmation. If you already paid, wait a moment and refresh this page.", "loading");
+          payBtn.disabled = false;
+          payBtn.textContent = "🔥 PAY " + money(plans[selectedPlan].amount) + " WITH M-PESA";
+        }
+      }, 5000);
+    } catch (error) {
+      console.error("VIP payment error:", error);
+      stopPolling();
+      setStatus(error.message || "Unable to connect to the payment service.", "error");
+      payBtn.disabled = false;
+      payBtn.textContent = "🔥 PAY " + money(plans[selectedPlan].amount) + " WITH M-PESA";
+    }
+  });
+})();
+</script>
+</body>
+</html>

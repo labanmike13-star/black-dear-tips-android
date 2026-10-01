@@ -1,0 +1,9 @@
+BLACK-DEAR-TIPS V18
+
+- Removed standalone V.I.P SLIPS from the public VIP list.
+- V.I.P CORRECT SCORE, V.I.P HT FT, and V.I.P OVER 2.5 each open a category-specific VIP payment page.
+- Under the payment card, that page shows results from yesterday for the selected category.
+- The public VIP list now contains only the three category buttons: CORRECT SCORE, HT FT, and OVER 2.5.
+- Admin VIP tips now support CATEGORY: CORRECT SCORE / HT FT / OVER 2.5.
+- Run vip-category-migration.sql ONCE in Supabase before using category-specific VIP results.
+- ZetuPay payment endpoints and existing payment environment variables are unchanged.

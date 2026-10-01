@@ -1,0 +1,18 @@
+BLACK-DEAR-TIPS — ZETUPAY PAYMENT SETUP
+
+1. Deploy this folder/project to Vercel.
+2. In Vercel Project Settings > Environment Variables, add:
+   SUPABASE_URL = https://mykoshiarlfhvpvrblvi.supabase.co
+   SUPABASE_SERVICE_ROLE_KEY = your Supabase service-role key
+   ZETUPAY_SECRET_KEY = your ZetuPay production sk_live_... secret key
+   SITE_URL = https://black-dear-tips.com
+3. In Supabase SQL Editor, run vip-payments.sql ONCE.
+4. In ZetuPay Merchant Portal > Developers > Webhooks & Callback Endpoints, add this under TRANSACTION CALLBACK ENDPOINTS:
+   https://black-dear-tips.com/api/zetupay-callback
+   Then click Save Webhook URLs.
+5. Payout callback is not required for VIP customer payments.
+6. Never put SUPABASE_SERVICE_ROLE_KEY or ZETUPAY_SECRET_KEY in HTML/JavaScript sent to the browser.
+7. VIP payment flow:
+   vip.html -> Vercel /api/zetupay-initiate -> ZetuPay STK Push -> signed webhook /api/zetupay-callback -> vip_payments -> vip-access.html
+8. The browser also polls /api/zetupay-status for up to 2 minutes so a cancelled/failed prompt can be shown without waiting for a webhook.
+\nVIP RESULTS (FREE YESTERDAY): The /api/vip-slips endpoint uses the Supabase publishable key so yesterday's public results work without SUPABASE_SERVICE_ROLE_KEY.\n

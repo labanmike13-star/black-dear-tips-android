@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow,noarchive"><meta name="viewport" content="width=device-width,initial-scale=1"><title>BLACK-DEAR-TIPS / ADMIN</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header class="header"><div class="brand">BLACK-DEAR-TIPS / ADMIN</div><nav><a href="index.html">PUBLIC SITE</a></nav></header>
+<main>
+<section id="loginSection" class="panel"><h2>SECURE ADMIN LOGIN</h2><input id="email" type="email" placeholder="Admin email"><input id="password" type="password" placeholder="Password"><button id="loginBtn">LOGIN</button><div class="notice">Only an account with role <b>admin</b> can manage this dashboard.</div></section>
+<section id="dashboard" class="hidden">
+  <div class="dash-head"><h2>ADMIN DASHBOARD</h2><div class="dash-actions"><button id="refreshAll" class="secondary">REFRESH</button><button id="logoutBtn" class="secondary">LOG OUT</button></div></div>
+  <div id="adminMessage" class="admin-message"></div>
+
+  <section class="panel"><h3>FREE TIPS</h3>
+    <div class="form-grid">
+      <input id="match" placeholder="Match — e.g. Italy vs Belgium">
+      <input id="tip" placeholder="Tip — e.g. Over 2.5">
+      <select id="status"><option>PENDING</option><option>WON</option><option>LOST</option></select>
+      <div class="date-picker-wrap"><input id="matchDate" type="date"><div class="date-quick"><button type="button" class="small secondary" id="todayDateBtn">TODAY</button><button type="button" class="small secondary" id="tomorrowDateBtn">TOMORROW</button></div></div>
+      <button id="addTip">ADD FREE TIP</button>
+    </div>
+  </section>
+  <section class="panel"><div class="section-head"><h3>MANAGE FREE TIPS</h3><span id="freeCount" class="muted"></span></div><div id="adminTips">Loading...</div></section>
+
+  <section class="panel"><h3>VIP TIPS</h3>
+    <div class="form-grid">
+      <input id="vipMatch" placeholder="VIP match — e.g. Italy vs Belgium"><input id="vipTip" placeholder="VIP tip — e.g. 2-1">
+      <select id="vipCategory"><option value="CORRECT SCORE">CORRECT SCORE</option><option value="HT FT">HT FT</option><option value="OVER 2.5" selected>OVER 2.5</option></select>
+      <select id="vipStatus"><option>PENDING</option><option>WON</option><option>LOST</option></select><input id="vipDate" type="date"><button id="addVipTip">ADD VIP TIP</button>
+    </div>
+    <div id="vipTipsAdmin" style="margin-top:15px">Loading...</div>
+  </section>
+  <section class="panel"><h3>VIP PRICES</h3><div id="plansAdmin">Loading...</div></section>
+  <section class="panel"><div class="section-head"><h3>COMMUNITY COMMENTS</h3><span id="commentCountAdmin" class="muted"></span></div><div id="adminComments">Loading...</div></section>
+
+</section>
+</main>
+<script src="config.js"></script><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY);
+const $=id=>document.getElementById(id);
+function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function msg(text,type=''){const el=$('adminMessage');el.textContent=text||'';el.className='admin-message '+type;if(text)setTimeout(()=>{if(el.textContent===text)el.textContent=''},4000)}
+function busy(btn,on){if(btn){btn.disabled=on;btn.dataset.old=btn.dataset.old||btn.textContent;if(on)btn.textContent='SAVING...';else btn.textContent=btn.dataset.old}}
+async function isAdmin(user){const {data,error}=await sb.from('profiles').select('role').eq('id',user.id).maybeSingle();if(error)throw new Error('Could not verify admin role: '+error.message);return data?.role==='admin'}
+$('loginBtn').onclick=async()=>{const email=$('email').value.trim(),password=$('password').value;if(!email||!password)return msg('Enter your email and password.','error');busy($('loginBtn'),true);try{const {data,error}=await sb.auth.signInWithPassword({email,password});if(error)throw error;if(!(await isAdmin(data.user))){await sb.auth.signOut();throw new Error('This account is not an admin.')}await showDashboard()}catch(e){msg(e.message,'error')}finally{busy($('loginBtn'),false)}};
+async function showDashboard(){$('loginSection').classList.add('hidden');$('dashboard').classList.remove('hidden');await refreshAll()}
+$('logoutBtn').onclick=async()=>{await sb.auth.signOut();location.reload()};
+$('refreshAll').onclick=refreshAll;
+function localISODate(offset=0){const d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()+offset);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+$('todayDateBtn').onclick=()=>{$('matchDate').value=localISODate(0)};
+$('tomorrowDateBtn').onclick=()=>{$('matchDate').value=localISODate(1)};
+$('matchDate').value=localISODate(0);
+
+
+$('addTip').onclick=async()=>{const btn=$('addTip'),match_name=$('match').value.trim(),tip=$('tip').value.trim();if(!match_name||!tip)return msg('Enter match and tip.','error');busy(btn,true);try{const {error}=await sb.from('tips').insert({match_name,tip,status:$('status').value,match_date:$('matchDate').value||null});if(error)throw error;$('match').value='';$('tip').value='';$('matchDate').value='';msg('Free tip added.','success');await loadAdminTips()}catch(e){msg('Could not add free tip: '+e.message+' — If this says permission denied, run admin-policies-fix.sql in Supabase SQL Editor.','error')}finally{busy(btn,false)}};
+
+function editFreeRow(t){return `<tr data-id="${t.id}"><td><input class="edit-match" value="${esc(t.match)}"></td><td><input class="edit-tip" value="${esc(t.tip)}"></td><td><select class="edit-status"><option ${t.status==='PENDING'?'selected':''}>PENDING</option><option ${t.status==='WON'?'selected':''}>WON</option><option ${t.status==='LOST'?'selected':''}>LOST</option></select></td><td><input class="edit-date" type="date" value="${esc(t.date||'')}"></td><td><button class="small save-free">SAVE</button><button class="small secondary cancel-free">CANCEL</button><button class="small danger delete-free">DELETE</button></td></tr>`}
+async function loadAdminTips(){const box=$('adminTips');box.textContent='Loading...';const {data,error}=await sb.from('tips').select('*').order('created_at',{ascending:false});if(error){box.textContent=error.message;return}$('freeCount').textContent=`${data.length} tip${data.length===1?'':'s'}`;box.innerHTML=data.length?`<div class="table-wrap"><table><thead><tr><th>MATCH</th><th>TIP</th><th>STATUS</th><th>DATE</th><th>ACTION</th></tr></thead><tbody>${data.map(t=>`<tr data-id="${t.id}"><td>${esc(t.match)}</td><td>${esc(t.tip)}</td><td><span class="status-pill ${String(t.status).toLowerCase()}">${esc(t.status)}</span></td><td>${esc(t.date||'')}</td><td><button class="small edit-free">EDIT</button><button class="small danger delete-free">DELETE</button></td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">No free tips.</div>';
+box.querySelectorAll('.edit-free').forEach(b=>b.onclick=()=>{const row=b.closest('tr');const t={id:row.dataset.id,match_name:row.children[0].textContent.trim(),tip:row.children[1].textContent.trim(),status:row.children[2].textContent.trim(),match_date:row.children[3].textContent.trim()};row.outerHTML=editFreeRow(t);wireFreeEdit()});wireFreeDelete()}
+function wireFreeEdit(){document.querySelectorAll('.save-free').forEach(b=>b.onclick=async()=>{const row=b.closest('tr'),id=row.dataset.id;const payload={match_name:row.querySelector('.edit-match').value.trim(),tip:row.querySelector('.edit-tip').value.trim(),status:row.querySelector('.edit-status').value,match_date:row.querySelector('.edit-date').value||null};if(!payload.match_name||!payload.tip)return msg('Match and tip are required.','error');busy(b,true);const {error}=await sb.from('tips').update(payload).eq('id',id);if(error){msg('Update failed: '+error.message+' — If this says permission denied, run admin-policies-fix.sql in Supabase SQL Editor.','error');busy(b,false);return}msg('Tip updated successfully.','success');await loadAdminTips()});document.querySelectorAll('.cancel-free').forEach(b=>b.onclick=loadAdminTips)}
+function wireFreeDelete(){document.querySelectorAll('.delete-free').forEach(b=>b.onclick=async()=>{const id=b.closest('tr').dataset.id;if(!confirm('Delete this free tip?'))return;busy(b,true);const {error}=await sb.from('tips').delete().eq('id',id);if(error){msg('Delete failed: '+error.message+' — If this says permission denied, run admin-policies-fix.sql in Supabase SQL Editor.','error');busy(b,false);return}msg('Tip deleted.','success');await loadAdminTips()})}
+
+$('addVipTip').onclick=async()=>{const btn=$('addVipTip'),match_name=$('vipMatch').value.trim(),tip=$('vipTip').value.trim(),category=$('vipCategory').value;if(!match_name||!tip)return msg('Enter VIP match and tip.','error');busy(btn,true);try{const {error}=await sb.from('vip_tips').insert({match:match_name,tip,category,status:$('vipStatus').value,date:$('vipDate').value||new Date().toISOString().slice(0,10)});if(error)throw error;$('vipMatch').value='';$('vipTip').value='';$('vipDate').value='';msg('VIP tip added.','success');await loadVipTips()}catch(e){msg('Could not add VIP tip: '+e.message,'error')}finally{busy(btn,false)}};
+function editVipRow(t){return `<tr data-id="${t.id}"><td><input class="v-match" value="${esc(t.match)}"></td><td><input class="v-tip" value="${esc(t.tip)}"></td><td><select class="v-category"><option value="correct-score" ${t.category==='CORRECT SCORE'?'selected':''}>CORRECT SCORE</option><option value="ht-ft" ${t.category==='HT FT'?'selected':''}>HT FT</option><option value="over-2-5" ${(!t.category||t.category==='OVER 2.5')?'selected':''}>OVER 2.5</option></select></td><td><select class="v-status"><option ${t.status==='PENDING'?'selected':''}>PENDING</option><option ${t.status==='WON'?'selected':''}>WON</option><option ${t.status==='LOST'?'selected':''}>LOST</option></select></td><td><input class="v-date" type="date" value="${esc(t.date||'')}"></td><td><button class="small save-vip">SAVE</button><button class="small secondary cancel-vip">CANCEL</button><button class="small danger delete-vip">DELETE</button></td></tr>`}
+function catLabel(v){return String(v||'').toUpperCase()}
+async function loadVipTips(){const box=$('vipTipsAdmin');const {data,error}=await sb.from('vip_tips').select('*').order('created_at',{ascending:false});if(error){box.textContent=error.message+' — Run vip-category-migration.sql once if category is missing.';return}box.innerHTML=data.length?`<div class="table-wrap"><table><thead><tr><th>MATCH</th><th>TIP</th><th>CATEGORY</th><th>STATUS</th><th>DATE</th><th>ACTION</th></tr></thead><tbody>${data.map(t=>`<tr data-id="${t.id}"><td>${esc(t.match)}</td><td>${esc(t.tip)}</td><td>${esc(catLabel(t.category))}</td><td><span class="status-pill ${String(t.status).toLowerCase()}">${esc(t.status)}</span></td><td>${esc(t.date||'')}</td><td><button class="small edit-vip">EDIT</button><button class="small danger delete-vip">DELETE</button></td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">No VIP tips.</div>';box.querySelectorAll('.edit-vip').forEach(b=>b.onclick=()=>{const r=b.closest('tr');r.outerHTML=editVipRow({id:r.dataset.id,match:r.children[0].textContent.trim(),tip:r.children[1].textContent.trim(),category:r.children[2].textContent.trim(),status:r.children[3].textContent.trim(),match_date:r.children[4].textContent.trim()});wireVipEdit()});wireVipDelete()}
+function wireVipEdit(){document.querySelectorAll('.save-vip').forEach(b=>b.onclick=async()=>{const r=b.closest('tr');const payload={match:r.querySelector('.v-match').value.trim(),tip:r.querySelector('.v-tip').value.trim(),category:r.querySelector('.v-category').value,status:r.querySelector('.v-status').value,date:r.querySelector('.v-date').value||new Date().toISOString().slice(0,10)};if(!payload.match_name||!payload.tip)return msg('Match and tip are required.','error');busy(b,true);const {error}=await sb.from('vip_tips').update(payload).eq('id',r.dataset.id);if(error){msg('VIP update failed: '+error.message,'error');busy(b,false);return}msg('VIP tip updated.','success');await loadVipTips()});document.querySelectorAll('.cancel-vip').forEach(b=>b.onclick=loadVipTips)}
+function wireVipDelete(){document.querySelectorAll('.delete-vip').forEach(b=>b.onclick=async()=>{const id=b.closest('tr').dataset.id;if(!confirm('Delete this VIP tip?'))return;busy(b,true);const {error}=await sb.from('vip_tips').delete().eq('id',id);if(error){msg('VIP delete failed: '+error.message,'error');busy(b,false);return}msg('VIP tip deleted.','success');await loadVipTips()})}
+
+async function loadAdminComments(){const box=$('adminComments');box.textContent='Loading...';const {data,error}=await sb.from('comments').select('id,parent_id,name,body,created_at').order('created_at',{ascending:false});if(error){box.textContent=error.message;return}$('commentCountAdmin').textContent=`${data.length} comment${data.length===1?'':'s'}`;box.innerHTML=data.length?`<div class="admin-comment-list">${data.map(c=>`<div class="admin-comment-row" data-id="${c.id}"><div><b>${esc(c.name)}</b><span class="muted">${esc(new Date(c.created_at).toLocaleString())}</span><div class="admin-comment-body">${esc(c.body)}</div>${c.parent_id?'<small class="muted">↳ Reply</small>':''}</div><button class="small danger delete-comment">DELETE</button></div>`).join('')}</div>`:'<div class="empty">No comments yet.</div>';box.querySelectorAll('.delete-comment').forEach(b=>b.onclick=async()=>{const id=b.closest('.admin-comment-row').dataset.id;if(!confirm('Delete this comment? Any replies to it will also be deleted.'))return;busy(b,true);const {error}=await sb.from('comments').delete().eq('id',id);if(error){msg('Comment delete failed: '+error.message,'error');busy(b,false);return}msg('Comment deleted.','success');await loadAdminComments()})}
+
+async function loadPlans(){const {data,error}=await sb.from('vip_plans').select('*').order('duration_days');if(error){$('plansAdmin').textContent=error.message;return}$('plansAdmin').innerHTML=data.map(p=>`<div class="plan-row"><b>${esc(p.name)}</b><input id="price-${p.id}" type="number" min="0" step="1" value="${Number(p.price)}"><label><input id="active-${p.id}" type="checkbox" ${p.active?'checked':''}> Active</label><button class="small" onclick="savePlan(${p.id})">SAVE</button></div>`).join('')}
+window.savePlan=async id=>{const price=Number($(`price-${id}`).value),active=$(`active-${id}`).checked;const {error}=await sb.from('vip_plans').update({price,active}).eq('id',id);if(error)msg('Plan update failed: '+error.message,'error');else msg('VIP plan updated.','success')};
+async function refreshAll(){await Promise.all([loadAdminTips(),loadVipTips(),loadPlans(),loadAdminComments()])}
+let pollTimer=null;function startPolling(){clearInterval(pollTimer);pollTimer=setInterval(()=>{if(!$('dashboard').classList.contains('hidden'))refreshAll()},7000)}
+(async()=>{const {data:{session}}=await sb.auth.getSession();if(session?.user)try{if(await isAdmin(session.user)){await showDashboard();startPolling()}}catch(e){console.warn(e.message)}})();
+sb.auth.onAuthStateChange(async(event,session)=>{if(event==='SIGNED_IN'&&session?.user){try{if(await isAdmin(session.user)){await showDashboard();startPolling()}}catch(e){msg(e.message,'error')}}if(event==='SIGNED_OUT'){clearInterval(pollTimer)}});
+</script></body></html>

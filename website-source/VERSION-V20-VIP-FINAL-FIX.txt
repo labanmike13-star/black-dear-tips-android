@@ -1,0 +1,3 @@
+BLACK-DEAR-TIPS V20 VIP FINAL FIX
+Canonical vip_tips schema: match, tip, category, status, date.
+Yesterday results are free; today VIP tips are paid/locked.

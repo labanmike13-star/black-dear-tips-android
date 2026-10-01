@@ -1,0 +1,3 @@
+BLACK-DEAR-TIPS V21 - Exact front board reference style. Buttons, payment, Supabase and admin logic unchanged.
+
+V10 NORMAL HOME: profile corner, welcome text, separate today/yesterday boxes, existing buttons preserved.

@@ -1,0 +1,1 @@
+V21.2 — compact game tables with inset margins; TODAY and YESTERDAY title displays matched; buttons unchanged.
